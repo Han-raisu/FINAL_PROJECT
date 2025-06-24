@@ -1,5 +1,6 @@
-import React, { useEffect, useState }  from 'react';
-
+import React, { useEffect, useState } from "react";
+import { supabase } from "../components/supabaseClient";
+import { Link } from "react-router-dom";
 
 interface Meal {
   idMeal: string;
@@ -7,52 +8,114 @@ interface Meal {
   strMealThumb: string;
 }
 
-
 const Recipes: React.FC = () => {
+  const [userId, setUserId] = useState<string | null>(null);
   const [meals, setMeals] = useState<Meal[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [ingredient, setIngredient] = useState(''); // 初期値
+  const [loading, setLoading] = useState<boolean>(true);
+  const [ingredientTried, setIngredientTried] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState<string>("");
 
+  // 初期：登録済み食材からレシピ候補を表示
   useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`);
-        const data = await res.json();
-        setMeals(data.meals || []);
-      } catch (error) {
-        console.error('エラー:', error);
-        setMeals([]);
-      } finally {
-        setLoading(false);
+    const fetchUserAndIngredients = async () => {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      const uid = session?.user?.id ?? null;
+      setUserId(uid);
+
+      if (uid) {
+        const { data, error } = await supabase
+          .from("ingredients")
+          .select("name")
+          .eq("user_id", uid);
+
+        if (!error && data && data.length > 0) {
+          for (const item of data) {
+            const ingredientName = item.name.trim().toLowerCase();
+            console.log(`試行中: ${ingredientName}`);
+            const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredientName}`);
+            const apiData = await res.json();
+            if (apiData.meals) {
+              setMeals(apiData.meals);
+              setIngredientTried(ingredientName);
+              setLoading(false);
+              return;
+            }
+          }
+          setMeals([]);
+          setLoading(false);
+        } else {
+          console.warn("食材が登録されていません。");
+          setMeals([]);
+          setLoading(false);
+        }
       }
     };
 
-    fetchRecipes();
-  }, [ingredient]);
+    fetchUserAndIngredients();
+  }, []);
+
+  // 自由検索
+  const handleSearch = async () => {
+    if (!searchInput.trim()) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${searchInput.trim().toLowerCase()}`);
+      const data = await res.json();
+      setMeals(data.meals || []);
+      setIngredientTried(searchInput.trim().toLowerCase());
+    } catch (err) {
+      console.error("検索エラー:", err);
+      setMeals([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="食材を入力（例: 鶏肉）"
-        value={ingredient}
-        onChange={(e) => setIngredient(e.target.value)}
-        className="border mt-4 p-2 mb-4"
-      />
+    <div className="p-4 space-y-4">
+      <div className="flex space-x-2">
+        <input
+          type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          placeholder="食材名を入力（例: chicken）"
+          className="border p-2 rounded w-full"
+        />
+        <button
+          onClick={handleSearch}
+          className="bg-blue-500 text-white px-4 rounded"
+        >
+          検索
+        </button>
+      </div>
 
       {loading ? (
         <p>読み込み中...</p>
       ) : meals.length === 0 ? (
         <p>該当するレシピが見つかりませんでした。</p>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {meals.map((meal) => (
-            <div key={meal.idMeal} className="border rounded-lg p-2 shadow">
-              <img src={meal.strMealThumb} alt={meal.strMeal} className="w-full h-48 object-cover rounded" />
-              <p className="text-center mt-2 font-semibold">{meal.strMeal}</p>
-            </div>
-          ))}
-        </div>
+        <>
+          <p className="text-sm text-gray-500">検索に使った食材: {ingredientTried}</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {meals.map((meal) => (
+              <div key={meal.idMeal} className="border rounded p-2 shadow">
+                <img
+                  src={meal.strMealThumb}
+                  alt={meal.strMeal}
+                  className="w-full h-48 object-cover rounded"
+                />
+                <p className="text-center mt-2 font-semibold">{meal.strMeal}</p>
+                <Link
+                  to={`/recipes/${meal.idMeal}`}
+                  className="block text-blue-500 text-center mt-1 underline"
+                >
+                  詳細を見る
+                </Link>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

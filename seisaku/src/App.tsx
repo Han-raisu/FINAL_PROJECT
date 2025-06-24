@@ -11,6 +11,7 @@ import IngredientsPage from "./pages/IngredientsPage";
 import RecipesPage from "./pages/RecipesPage";
 import { useUserStore } from "./components/index";
 import NewLogin from "./pages/NewLogin";
+import RecipeDetail from "./components/RecipeDetail";
 
 function App() {
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
@@ -31,6 +32,13 @@ function App() {
             isLoggedIn ? <IngredientsPage /> : <Navigate to="/login" replace />
           }
         />
+        <Route
+          path="/recipes/:id"
+          element={
+            isLoggedIn ? <RecipeDetail /> : <Navigate to="/login" replace />
+          }
+        />
+
         <Route
           path="/recipes"
           element={

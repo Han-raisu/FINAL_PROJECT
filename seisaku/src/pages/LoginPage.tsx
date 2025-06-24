@@ -11,7 +11,6 @@ import React, { useState } from "react";
 import { supabase } from "../components/supabaseClient";
 import { useNavigate, Link } from "react-router-dom";
 import { useUserStore } from "../components/index";
-import { NewLogin } from "./NewLogin";
 
 const Login = () => {
   const setUserId = useUserStore((state) => state.setUserId);
