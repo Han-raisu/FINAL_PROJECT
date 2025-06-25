@@ -6,9 +6,52 @@ interface Meal {
   idMeal: string;
   strMeal: string;
   strMealThumb: string;
+  translatedMeal?: string;
 }
 
-const Recipes: React.FC = () => {
+const Recipespege: React.FC = () => {
+  // 日本語→英語翻訳関数
+  const translateToEnglish = async (text: string): Promise<string> => {
+    try {
+      const res = await fetch("http://localhost:3001/api/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          q: text,
+          source: "ja",
+          target: "en",
+          format: "text",
+        }),
+      });
+      const data = await res.json();
+      return data.translatedText;
+    } catch (err) {
+      console.error("翻訳エラー:", err);
+      return text; // 失敗時は元のテキストを返す
+    }
+  };
+
+  // 英語→日本語翻訳関数
+  const translateToJapanese = async (text: string): Promise<string> => {
+    try {
+      const res = await fetch("http://localhost:3001/api/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          q: text,
+          source: "en",
+          target: "ja",
+          format: "text",
+        }),
+      });
+      const data = await res.json();
+      return data.translatedText;
+    } catch (err) {
+      console.error("翻訳エラー:", err);
+      return text;
+    }
+  };
+
   const [userId, setUserId] = useState<string | null>(null);
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -19,7 +62,9 @@ const Recipes: React.FC = () => {
   useEffect(() => {
     const fetchUserAndIngredients = async () => {
       setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const uid = session?.user?.id ?? null;
       setUserId(uid);
 
@@ -33,10 +78,25 @@ const Recipes: React.FC = () => {
           for (const item of data) {
             const ingredientName = item.name.trim().toLowerCase();
             console.log(`試行中: ${ingredientName}`);
-            const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredientName}`);
+
+            // 日本語→英語翻訳してからAPIに投げる
+            const translatedIngredient = await translateToEnglish(
+              ingredientName
+            );
+            console.log(`翻訳後: ${translatedIngredient}`);
+
+            const res = await fetch(
+              `https://www.themealdb.com/api/json/v1/1/filter.php?i=${translatedIngredient}`
+            );
             const apiData = await res.json();
             if (apiData.meals) {
-              setMeals(apiData.meals);
+              const translatedMeals: Meal[] = await Promise.all(
+                apiData.meals.map(async (meal: Meal) => {
+                  const translated = await translateToJapanese(meal.strMeal);
+                  return { ...meal, translatedMeal: translated };
+                })
+              );
+              setMeals(translatedMeals);
               setIngredientTried(ingredientName);
               setLoading(false);
               return;
@@ -60,9 +120,29 @@ const Recipes: React.FC = () => {
     if (!searchInput.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${searchInput.trim().toLowerCase()}`);
+      // 日本語→英語翻訳してからAPIに投げる
+      const translatedInput = await translateToEnglish(
+        searchInput.trim().toLowerCase()
+      );
+      console.log(`検索翻訳後: ${translatedInput}`);
+
+      const res = await fetch(
+        `https://www.themealdb.com/api/json/v1/1/filter.php?i=${translatedInput}`
+      );
       const data = await res.json();
-      setMeals(data.meals || []);
+
+      if (data.meals) {
+        // レシピ名を日本語翻訳
+        const translatedMeals: Meal[] = await Promise.all(
+          data.meals.map(async (meal: Meal) => {
+            const translated = await translateToJapanese(meal.strMeal);
+            return { ...meal, translatedMeal: translated };
+          })
+        );
+        setMeals(translatedMeals);
+      } else {
+        setMeals([]);
+      }
       setIngredientTried(searchInput.trim().toLowerCase());
     } catch (err) {
       console.error("検索エラー:", err);
@@ -79,7 +159,7 @@ const Recipes: React.FC = () => {
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="食材名を入力（例: chicken）"
+          placeholder="食材名を入力（例: 鶏肉、たまご）"
           className="border p-2 rounded w-full"
         />
         <button
@@ -96,7 +176,9 @@ const Recipes: React.FC = () => {
         <p>該当するレシピが見つかりませんでした。</p>
       ) : (
         <>
-          <p className="text-sm text-gray-500">検索に使った食材: {ingredientTried}</p>
+          <p className="text-sm text-gray-500">
+            検索に使った食材: {ingredientTried}
+          </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {meals.map((meal) => (
               <div key={meal.idMeal} className="border rounded p-2 shadow">
@@ -105,7 +187,10 @@ const Recipes: React.FC = () => {
                   alt={meal.strMeal}
                   className="w-full h-48 object-cover rounded"
                 />
-                <p className="text-center mt-2 font-semibold">{meal.strMeal}</p>
+                <p className="text-center mt-2 font-semibold">
+                  {" "}
+                  {meal.translatedMeal ?? meal.strMeal}
+                </p>
                 <Link
                   to={`/recipes/${meal.idMeal}`}
                   className="block text-blue-500 text-center mt-1 underline"
@@ -121,4 +206,4 @@ const Recipes: React.FC = () => {
   );
 };
 
-export default Recipes;
+export default Recipespege;
