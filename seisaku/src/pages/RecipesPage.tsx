@@ -7,55 +7,16 @@ interface Meal {
   idMeal: string;
   strMeal: string;
   strMealThumb: string;
-  translatedMeal?: string;
 }
 
 const Recipespege: React.FC = () => {
   // 日本語→英語翻訳関数
-  const translateToEnglish = async (text: string): Promise<string> => {
+  const translateToEnglish = (text: string): string => {
     const cleaned = text.trim();
-    const fromDictionary = dictionaryTranslate(cleaned);
-    if (fromDictionary) return fromDictionary;
-
-    try {
-      const res = await fetch("http://localhost:3001/api/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          q: cleaned,
-          source: "ja",
-          target: "en",
-          format: "text",
-        }),
-      });
-      const data = await res.json();
-      return data.translatedText;
-    } catch (err) {
-      console.error("翻訳エラー:", err);
-      return cleaned;
-    }
+    const translated = dictionaryTranslate(cleaned);
+    return translated ?? cleaned;
   };
 
-  // 英語→日本語翻訳関数
-  const translateToJapanese = async (text: string): Promise<string> => {
-    try {
-      const res = await fetch("http://localhost:3001/api/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          q: text,
-          source: "en",
-          target: "ja",
-          format: "text",
-        }),
-      });
-      const data = await res.json();
-      return data.translatedText;
-    } catch (err) {
-      console.error("翻訳エラー:", err);
-      return text;
-    }
-  };
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [ingredientTried, setIngredientTried] = useState<string | null>(null);
@@ -79,26 +40,15 @@ const Recipespege: React.FC = () => {
         if (!error && data && data.length > 0) {
           for (const item of data) {
             const ingredientName = item.name.trim().toLowerCase();
-            console.log(`試行中: ${ingredientName}`);
-
-            // 日本語→英語翻訳してからAPIに投げる
-            const translatedIngredient = await translateToEnglish(
-              ingredientName
-            );
-            console.log(`翻訳後: ${translatedIngredient}`);
+            const translatedIngredient = translateToEnglish(ingredientName);
 
             const res = await fetch(
               `https://www.themealdb.com/api/json/v1/1/filter.php?i=${translatedIngredient}`
             );
             const apiData = await res.json();
+
             if (apiData.meals) {
-              const translatedMeals: Meal[] = await Promise.all(
-                apiData.meals.map(async (meal: Meal) => {
-                  const translated = await translateToJapanese(meal.strMeal);
-                  return { ...meal, translatedMeal: translated };
-                })
-              );
-              setMeals(translatedMeals);
+              setMeals(apiData.meals);
               setIngredientTried(ingredientName);
               setLoading(false);
               return;
@@ -107,7 +57,6 @@ const Recipespege: React.FC = () => {
           setMeals([]);
           setLoading(false);
         } else {
-          console.warn("食材が登録されていません。");
           setMeals([]);
           setLoading(false);
         }
@@ -122,11 +71,7 @@ const Recipespege: React.FC = () => {
     if (!searchInput.trim()) return;
     setLoading(true);
     try {
-      // 日本語→英語翻訳してからAPIに投げる
-      const translatedInput = await translateToEnglish(
-        searchInput.trim().toLowerCase()
-      );
-      console.log(`検索翻訳後: ${translatedInput}`);
+      const translatedInput = translateToEnglish(searchInput.trim().toLowerCase());
 
       const res = await fetch(
         `https://www.themealdb.com/api/json/v1/1/filter.php?i=${translatedInput}`
@@ -134,14 +79,7 @@ const Recipespege: React.FC = () => {
       const data = await res.json();
 
       if (data.meals) {
-        // レシピ名を日本語翻訳
-        const translatedMeals: Meal[] = await Promise.all(
-          data.meals.map(async (meal: Meal) => {
-            const translated = await translateToJapanese(meal.strMeal);
-            return { ...meal, translatedMeal: translated };
-          })
-        );
-        setMeals(translatedMeals);
+        setMeals(data.meals);
       } else {
         setMeals([]);
       }
@@ -190,8 +128,7 @@ const Recipespege: React.FC = () => {
                   className="w-full h-48 object-cover rounded"
                 />
                 <p className="text-center mt-2 font-semibold">
-                  {" "}
-                  {meal.translatedMeal ?? meal.strMeal}
+                  {meal.strMeal}
                 </p>
                 <Link
                   to={`/recipes/${meal.idMeal}`}
