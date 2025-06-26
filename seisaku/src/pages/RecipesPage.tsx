@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../components/supabaseClient";
 import { Link } from "react-router-dom";
+import { translateToEnglish as dictionaryTranslate } from "../components/foodTranslator";
 
 interface Meal {
   idMeal: string;
@@ -12,12 +13,16 @@ interface Meal {
 const Recipespege: React.FC = () => {
   // 日本語→英語翻訳関数
   const translateToEnglish = async (text: string): Promise<string> => {
+    const cleaned = text.trim();
+    const fromDictionary = dictionaryTranslate(cleaned);
+    if (fromDictionary) return fromDictionary;
+
     try {
       const res = await fetch("http://localhost:3001/api/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          q: text,
+          q: cleaned,
           source: "ja",
           target: "en",
           format: "text",
@@ -27,7 +32,7 @@ const Recipespege: React.FC = () => {
       return data.translatedText;
     } catch (err) {
       console.error("翻訳エラー:", err);
-      return text; // 失敗時は元のテキストを返す
+      return cleaned;
     }
   };
 
@@ -51,8 +56,6 @@ const Recipespege: React.FC = () => {
       return text;
     }
   };
-
-  const [userId, setUserId] = useState<string | null>(null);
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [ingredientTried, setIngredientTried] = useState<string | null>(null);
@@ -66,7 +69,6 @@ const Recipespege: React.FC = () => {
         data: { session },
       } = await supabase.auth.getSession();
       const uid = session?.user?.id ?? null;
-      setUserId(uid);
 
       if (uid) {
         const { data, error } = await supabase
