@@ -15,7 +15,7 @@ app.post('/api/translate', async (req, res) => {
     
     const { q, source, target, format } = req.body;
     
-    // MyMemory翻訳APIを使用（より安定）
+    // MyMemory翻訳APIを使用
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(q)}&langpair=${source}|${target}`;
     
     const response = await fetch(url);
