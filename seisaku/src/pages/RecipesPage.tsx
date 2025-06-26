@@ -40,7 +40,7 @@ const Recipespege: React.FC = () => {
         if (!error && data && data.length > 0) {
           for (const item of data) {
             const ingredientName = item.name.trim().toLowerCase();
-            const translatedIngredient = translateToEnglish(ingredientName);
+            const translatedIngredient = ingredientName;
 
             const res = await fetch(
               `https://www.themealdb.com/api/json/v1/1/filter.php?i=${translatedIngredient}`
@@ -71,7 +71,9 @@ const Recipespege: React.FC = () => {
     if (!searchInput.trim()) return;
     setLoading(true);
     try {
-      const translatedInput = translateToEnglish(searchInput.trim().toLowerCase());
+      const translatedInput = translateToEnglish(
+        searchInput.trim().toLowerCase()
+      );
 
       const res = await fetch(
         `https://www.themealdb.com/api/json/v1/1/filter.php?i=${translatedInput}`
@@ -127,9 +129,7 @@ const Recipespege: React.FC = () => {
                   alt={meal.strMeal}
                   className="w-full h-48 object-cover rounded"
                 />
-                <p className="text-center mt-2 font-semibold">
-                  {meal.strMeal}
-                </p>
+                <p className="text-center mt-2 font-semibold">{meal.strMeal}</p>
                 <Link
                   to={`/recipes/${meal.idMeal}`}
                   className="block text-blue-500 text-center mt-1 underline"

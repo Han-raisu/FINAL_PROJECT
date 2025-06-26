@@ -1,14 +1,16 @@
-// src/utils/foodTranslator.ts
-import foodDictionary from '../assets/food_dictionary.json';
+// foodTranslator.ts
+import dictionaryJson from "../assets/food_dictionary.json";
 
-export const translateToEnglish = (jpInput: string): string | null => {
-  const input = jpInput.trim();
+const dictionary: Record<string, string> = Array.isArray(dictionaryJson)
+  ? dictionaryJson.reduce((acc: Record<string, string>, item: { jp: string[]; en: string }) => {
+      item.jp.forEach(jpWord => {
+        acc[jpWord] = item.en;
+      });
+      return acc;
+    }, {})
+  : {};
 
-  for (const entry of foodDictionary) {
-    if (entry.jp.includes(input)) {
-      return entry.en;
-    }
-  }
-
-  return null; // 辞書に見つからない場合
+export const translateToEnglish = (text: string): string | null => {
+  const cleaned = text.trim();
+  return dictionary[cleaned] ?? null;
 };
