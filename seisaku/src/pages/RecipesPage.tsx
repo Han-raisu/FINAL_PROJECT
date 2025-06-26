@@ -12,7 +12,7 @@ interface Meal {
 const Recipespege: React.FC = () => {
   // 日本語→英語翻訳関数
   const translateToEnglish = (text: string): string => {
-    const cleaned = text.trim();
+    const cleaned = text.trim().toLowerCase().replace(/\s/g, "");
     const translated = dictionaryTranslate(cleaned);
     return translated ?? cleaned;
   };
@@ -40,7 +40,7 @@ const Recipespege: React.FC = () => {
         if (!error && data && data.length > 0) {
           for (const item of data) {
             const ingredientName = item.name.trim().toLowerCase();
-            const translatedIngredient = ingredientName;
+            const translatedIngredient = translateToEnglish(ingredientName); // ←翻訳ここ！
 
             const res = await fetch(
               `https://www.themealdb.com/api/json/v1/1/filter.php?i=${translatedIngredient}`
@@ -49,11 +49,12 @@ const Recipespege: React.FC = () => {
 
             if (apiData.meals) {
               setMeals(apiData.meals);
-              setIngredientTried(ingredientName);
+              setIngredientTried(item.name); // 元の表示名（日本語）のままでOK
               setLoading(false);
               return;
             }
           }
+
           setMeals([]);
           setLoading(false);
         } else {
