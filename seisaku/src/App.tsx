@@ -27,6 +27,10 @@ function App() {
           element={isLoggedIn ? <HomePage /> : <Navigate to="/login" replace />}
         />
         <Route
+          path="/home"
+          element={isLoggedIn ? <HomePage /> : <Navigate to="/login" replace />}
+        />
+        <Route
           path="/ingredients"
           element={
             isLoggedIn ? <IngredientsPage /> : <Navigate to="/login" replace />

@@ -14,7 +14,7 @@ import { useUserStore } from "../components/index";
 
 const Login = () => {
   const setUserId = useUserStore((state) => state.setUserId);
-  const userId = useUserStore((state) => state.userId);
+
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
   const setIsLoggedIn = useUserStore((state) => state.setIsLoggedIn);
   const [loginData, setLoginData] = useState({ email: "", password: "" });

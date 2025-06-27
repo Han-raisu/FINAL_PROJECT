@@ -20,12 +20,12 @@ const Header = () => {
             <span className="whitespace-nowrap">TOPページ</span>
           </Link>
 
-          <div className="flex space-x-4 overflow-x-auto">
+          <div className="flex space-x-4 overflow-x-auto ">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={isLoggedIn ? item.path : "/login"}
-                className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap ${
+                className={`flex items-center space-x-1 px-3 py-2 rounded-md  font-medium whitespace-nowrap text-xl ${
                   location.pathname === item.path
                     ? "bg-gray-900 text-white"
                     : "text-gray-700 hover:bg-gray-100"

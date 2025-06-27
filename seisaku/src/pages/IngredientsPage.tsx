@@ -8,6 +8,8 @@ interface Ingredient {
   remark: string | null;
   created_at: string;
   user_id: string;
+  quantity_value: number | null;
+  quantity_unit: string | null;
 }
 
 const Ingredients = () => {
@@ -17,12 +19,16 @@ const Ingredients = () => {
     name: "",
     expiry_date: "",
     remark: "",
+    quantity_value: "",
+    quantity_unit: "",
   });
   const [editId, setEditId] = useState<number | null>(null);
   const [editData, setEditData] = useState({
     name: "",
     expiry_date: "",
     remark: "",
+    quantity_value: "",
+    quantity_unit: "",
   });
 
   useEffect(() => {
@@ -62,10 +68,18 @@ const Ingredients = () => {
       name: formData.name,
       expiry_date: formData.expiry_date,
       remark: formData.remark,
+      quantity_value: Number(formData.quantity_value),
+      quantity_unit: formData.quantity_unit,
     });
 
     if (!error) {
-      setFormData({ name: "", expiry_date: "", remark: "" });
+      setFormData({
+        name: "",
+        expiry_date: "",
+        remark: "",
+        quantity_value: "",
+        quantity_unit: "",
+      });
       fetchItems(userId);
     } else {
       console.error("登録エラー:", error.message);
@@ -94,6 +108,8 @@ const Ingredients = () => {
       name: item.name,
       expiry_date: item.expiry_date,
       remark: item.remark ?? "",
+      quantity_value: item.quantity_value?.toString() ?? "",
+      quantity_unit: item.quantity_unit ?? "",
     });
   };
 
@@ -106,6 +122,8 @@ const Ingredients = () => {
         name: editData.name,
         expiry_date: editData.expiry_date,
         remark: editData.remark,
+        quantity_value: Number(editData.quantity_value),
+        quantity_unit: editData.quantity_unit,
       })
       .eq("id", editId)
       .eq("user_id", userId);
@@ -123,9 +141,9 @@ const Ingredients = () => {
       {userId ? (
         <>
           {/* 登録フォーム */}
-          <form onSubmit={handleSubmit} className="space-y-2">
+          <form onSubmit={handleSubmit} className="space-y-2 ">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block font-medium text-gray-900 mb-1 text-xl">
                 食材名
               </label>
               <input
@@ -139,7 +157,7 @@ const Ingredients = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xl font-medium text-gray-900 mb-1">
                 賞味期限
               </label>
               <input
@@ -153,7 +171,39 @@ const Ingredients = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xl font-medium text-gray-900 mb-1">
+                数量
+              </label>
+              <input
+                type="number"
+                value={formData.quantity_value}
+                onChange={(e) =>
+                  setFormData({ ...formData, quantity_value: e.target.value })
+                }
+                className="border p-2 rounded w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-xl font-medium text-gray-900 mb-1 mt-2">
+                単位
+              </label>
+              <select
+                value={formData.quantity_unit}
+                onChange={(e) =>
+                  setFormData({ ...formData, quantity_unit: e.target.value })
+                }
+                className="border p-2 rounded w-full"
+              >
+                <option value="">選択してください</option>
+                <option value="g">g</option>
+                <option value="ml">ml</option>
+                <option value="個">個</option>
+                <option value="本">本</option>
+                <option value="枚">枚</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xl font-medium text-gray-900 mb-1">
                 備考
               </label>
               <input
@@ -167,7 +217,7 @@ const Ingredients = () => {
             </div>
             <button
               type="submit"
-              className="bg-blue-500 text-white p-2 rounded"
+              className="bg-blue-500 text-white p-2 rounded text-xl"
             >
               登録
             </button>
@@ -176,7 +226,7 @@ const Ingredients = () => {
           {/* 一覧 + 編集削除 */}
           <div className="space-y-2">
             {items.map((item) => (
-              <div key={item.id} className="border p-2 rounded">
+              <div key={item.id} className="border p-2 rounded  leading-relaxed ">
                 {editId === item.id ? (
                   <>
                     <input
@@ -185,7 +235,7 @@ const Ingredients = () => {
                       onChange={(e) =>
                         setEditData({ ...editData, name: e.target.value })
                       }
-                      className="border p-1 rounded w-full mb-1"
+                      className="border p-1 rounded w-full mb-1 "
                     />
                     <input
                       type="date"
@@ -196,7 +246,7 @@ const Ingredients = () => {
                           expiry_date: e.target.value,
                         })
                       }
-                      className="border p-1 rounded w-full mb-1"
+                      className="border p-1 rounded w-full mb-1 "
                     />
                     <input
                       type="text"
@@ -206,6 +256,35 @@ const Ingredients = () => {
                       }
                       className="border p-1 rounded w-full mb-1"
                     />
+                    <input
+                      type="number"
+                      value={editData.quantity_value}
+                      onChange={(e) =>
+                        setEditData({
+                          ...editData,
+                          quantity_value: e.target.value,
+                        })
+                      }
+                      className="border p-1 rounded w-full mb-1"
+                    />
+
+                    <select
+                      value={editData.quantity_unit}
+                      onChange={(e) =>
+                        setEditData({
+                          ...editData,
+                          quantity_unit: e.target.value,
+                        })
+                      }
+                      className="border p-1 rounded w-full mb-1"
+                    >
+                      <option value="">単位を選択</option>
+                      <option value="g">g</option>
+                      <option value="ml">ml</option>
+                      <option value="個">個</option>
+                      <option value="本">本</option>
+                      <option value="枚">枚</option>
+                    </select>
                     <button
                       onClick={handleUpdate}
                       className="text-green-500 mr-2"
@@ -221,18 +300,22 @@ const Ingredients = () => {
                   </>
                 ) : (
                   <>
-                    <div>食材名: {item.name}</div>
-                    <div>賞味期限: {item.expiry_date}</div>
-                    <div>備考: {item.remark}</div>
+                    <div className="text-xl">食材名: {item.name}</div>
+                    <div className="text-xl">賞味期限: {item.expiry_date}</div>
+                    <div className="text-xl">備考: {item.remark}</div>
+                    <div className="text-xl">
+                      数量: {item.quantity_value}
+                      {item.quantity_unit ? item.quantity_unit : ""}
+                    </div>
                     <button
                       onClick={() => startEdit(item)}
-                      className="text-blue-500 mr-2"
+                      className="text-blue-500 mr-2 text-xl"
                     >
                       編集
                     </button>
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="text-red-500"
+                      className="text-red-500 text-xl"
                     >
                       削除
                     </button>
