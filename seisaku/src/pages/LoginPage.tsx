@@ -84,7 +84,7 @@ const Login = () => {
   };
 
   return (
-    <div className={cn("flex flex-col gap-4")}>
+    <div className={cn("flex flex-col gap-4 bg-lime-50")}>
       <Card>
         <CardHeader>
           <CardTitle>ログイン</CardTitle>
@@ -155,7 +155,7 @@ const Login = () => {
         </CardContent>
       </Card>
 
-      <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="border-2 border-black p-4 rounded-lg shadow-md bg-lime-50">
         <h2 className="text-2xl font-semibold mb-4">使い方</h2>
         <ol className="list-decimal list-inside space-y-4 text-gray-700">
           <li>アカウントを作成してログインします</li>

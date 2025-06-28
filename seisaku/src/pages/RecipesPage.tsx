@@ -96,7 +96,7 @@ const Recipespege: React.FC = () => {
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="bg-lime-50 p-4 space-y-4">
       <div className="flex space-x-2">
         <input
           type="text"

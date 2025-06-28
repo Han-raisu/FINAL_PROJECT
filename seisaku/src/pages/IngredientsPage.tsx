@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../components/supabaseClient";
-
+import StarBackground from "../components/RecipeDetail";
 interface Ingredient {
   id: number;
   name: string;
@@ -137,198 +137,207 @@ const Ingredients = () => {
   };
 
   return (
-    <div className="p-4 space-y-4">
-      {userId ? (
-        <>
-          {/* 登録フォーム */}
-          <form onSubmit={handleSubmit} className="space-y-2 ">
-            <div>
-              <label className="block font-medium text-gray-900 mb-1 text-xl">
-                食材名
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                required
-                className="border p-2 rounded w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-xl font-medium text-gray-900 mb-1">
-                賞味期限
-              </label>
-              <input
-                type="date"
-                value={formData.expiry_date}
-                onChange={(e) =>
-                  setFormData({ ...formData, expiry_date: e.target.value })
-                }
-                required
-                className="border p-2 rounded w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-xl font-medium text-gray-900 mb-1">
-                数量
-              </label>
-              <input
-                type="number"
-                value={formData.quantity_value}
-                onChange={(e) =>
-                  setFormData({ ...formData, quantity_value: e.target.value })
-                }
-                className="border p-2 rounded w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-xl font-medium text-gray-900 mb-1 mt-2">
-                単位
-              </label>
-              <select
-                value={formData.quantity_unit}
-                onChange={(e) =>
-                  setFormData({ ...formData, quantity_unit: e.target.value })
-                }
-                className="border p-2 rounded w-full"
-              >
-                <option value="">選択してください</option>
-                <option value="g">g</option>
-                <option value="ml">ml</option>
-                <option value="個">個</option>
-                <option value="本">本</option>
-                <option value="枚">枚</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xl font-medium text-gray-900 mb-1">
-                備考
-              </label>
-              <input
-                type="text"
-                value={formData.remark}
-                onChange={(e) =>
-                  setFormData({ ...formData, remark: e.target.value })
-                }
-                className="border p-2 rounded w-full"
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-blue-500 text-white p-2 rounded text-xl"
-            >
-              登録
-            </button>
-          </form>
-
-          {/* 一覧 + 編集削除 */}
-          <div className="space-y-2">
-            {items.map((item) => (
-              <div key={item.id} className="border p-2 rounded  leading-relaxed ">
-                {editId === item.id ? (
-                  <>
-                    <input
-                      type="text"
-                      value={editData.name}
-                      onChange={(e) =>
-                        setEditData({ ...editData, name: e.target.value })
-                      }
-                      className="border p-1 rounded w-full mb-1 "
-                    />
-                    <input
-                      type="date"
-                      value={editData.expiry_date}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          expiry_date: e.target.value,
-                        })
-                      }
-                      className="border p-1 rounded w-full mb-1 "
-                    />
-                    <input
-                      type="text"
-                      value={editData.remark}
-                      onChange={(e) =>
-                        setEditData({ ...editData, remark: e.target.value })
-                      }
-                      className="border p-1 rounded w-full mb-1"
-                    />
-                    <input
-                      type="number"
-                      value={editData.quantity_value}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          quantity_value: e.target.value,
-                        })
-                      }
-                      className="border p-1 rounded w-full mb-1"
-                    />
-
-                    <select
-                      value={editData.quantity_unit}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          quantity_unit: e.target.value,
-                        })
-                      }
-                      className="border p-1 rounded w-full mb-1"
-                    >
-                      <option value="">単位を選択</option>
-                      <option value="g">g</option>
-                      <option value="ml">ml</option>
-                      <option value="個">個</option>
-                      <option value="本">本</option>
-                      <option value="枚">枚</option>
-                    </select>
-                    <button
-                      onClick={handleUpdate}
-                      className="text-green-500 mr-2"
-                    >
-                      保存
-                    </button>
-                    <button
-                      onClick={() => setEditId(null)}
-                      className="text-gray-500"
-                    >
-                      キャンセル
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <div className="text-xl">食材名: {item.name}</div>
-                    <div className="text-xl">賞味期限: {item.expiry_date}</div>
-                    <div className="text-xl">備考: {item.remark}</div>
-                    <div className="text-xl">
-                      数量: {item.quantity_value}
-                      {item.quantity_unit ? item.quantity_unit : ""}
-                    </div>
-                    <button
-                      onClick={() => startEdit(item)}
-                      className="text-blue-500 mr-2 text-xl"
-                    >
-                      編集
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="text-red-500 text-xl"
-                    >
-                      削除
-                    </button>
-                  </>
-                )}
+      <div className=" p-4 space-y-4 bg-lime-50">
+        {userId ? (
+          <>
+            {/* 登録フォーム */}
+            <form onSubmit={handleSubmit} className="space-y-2 ">
+              <div>
+                <label className="block font-medium text-gray-900 mb-1 text-xl">
+                  食材名
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                  className="border-4 p-2 rounded w-full"
+                />
               </div>
-            ))}
-          </div>
-        </>
-      ) : (
-        <div>ログインが必要です</div>
-      )}
-    </div>
+              <div>
+                <label className="block text-xl font-medium text-gray-900 mb-1">
+                  賞味期限
+                </label>
+                <input
+                  type="date"
+                  value={formData.expiry_date}
+                  onChange={(e) =>
+                    setFormData({ ...formData, expiry_date: e.target.value })
+                  }
+                  required
+                  className="border-4 p-2 rounded w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-xl font-medium text-gray-900 mb-1">
+                  数量
+                </label>
+                <input
+                  type="number"
+                  value={formData.quantity_value}
+                  onChange={(e) =>
+                    setFormData({ ...formData, quantity_value: e.target.value })
+                  }
+                  className="border-4 p-2 rounded w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-xl font-medium text-gray-900 mb-1 mt-2">
+                  単位
+                </label>
+                <select
+                  value={formData.quantity_unit}
+                  onChange={(e) =>
+                    setFormData({ ...formData, quantity_unit: e.target.value })
+                  }
+                  className="border-4 p-2 rounded w-full"
+                >
+                  <option value="">選択してください</option>
+                  <option value="g">g</option>
+                  <option value="ml">ml</option>
+                  <option value="個">個</option>
+                  <option value="本">本</option>
+                  <option value="枚">枚</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xl font-medium text-gray-900 mb-1">
+                  備考
+                </label>
+                <textarea
+                  value={formData.remark}
+                  onChange={(e) =>
+                    setFormData({ ...formData, remark: e.target.value })
+                  }
+                  className="border-4 p-2 rounded w-full"
+                />
+              </div>
+              <button
+                type="submit"
+                className="bg-blue-500 text-white p-2 rounded text-xl font-bold "
+              >
+                登録
+              </button>
+            </form>
+
+            {/* 一覧 + 編集削除 */}
+            <div className="space-y-2 font-bold ">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="border-4 p-2 rounded  leading-relaxed "
+                >
+                  {editId === item.id ? (
+                    <>
+                      <input
+                        type="text"
+                        value={editData.name}
+                        onChange={(e) =>
+                          setEditData({ ...editData, name: e.target.value })
+                        }
+                        className="border p-1 rounded w-full mb-1 text-xl"
+                      />
+                      <input
+                        type="date"
+                        value={editData.expiry_date}
+                        onChange={(e) =>
+                          setEditData({
+                            ...editData,
+                            expiry_date: e.target.value,
+                          })
+                        }
+                        className="border p-1 rounded w-full mb-1 text-xl "
+                      />
+                      <input
+                        type="number"
+                        value={editData.quantity_value}
+                        onChange={(e) =>
+                          setEditData({
+                            ...editData,
+                            quantity_value: e.target.value,
+                          })
+                        }
+                        className="border p-1 rounded w-full mb-1 text-xl"
+                      />
+
+                      <select
+                        value={editData.quantity_unit}
+                        onChange={(e) =>
+                          setEditData({
+                            ...editData,
+                            quantity_unit: e.target.value,
+                          })
+                        }
+                        className="border p-1 rounded w-full mb-1 text-xl"
+                      >
+                        <option value="">単位を選択</option>
+                        <option value="g">g</option>
+                        <option value="ml">ml</option>
+                        <option value="個">個</option>
+                        <option value="本">本</option>
+                        <option value="枚">枚</option>
+                      </select>
+                      <input
+                        type="text"
+                        value={editData.remark}
+                        onChange={(e) =>
+                          setEditData({ ...editData, remark: e.target.value })
+                        }
+                        className="border break-words p-1 rounded w-full mb-1 text-xl"
+                      />
+                      <button
+                        onClick={handleUpdate}
+                        className="text-green-500 mr-2 text-xl"
+                      >
+                        保存
+                      </button>
+                      <button
+                        onClick={() => setEditId(null)}
+                        className="text-gray-500 text-xl"
+                      >
+                        キャンセル
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-xl border-b-2 border-b-black ">
+                        食材名: {item.name}
+                      </div>
+                      <div className="text-xl text-red-600">
+                        賞味期限: {item.expiry_date}
+                      </div>
+                      <div className="text-xl">
+                        数量: {item.quantity_value}
+                        {item.quantity_unit ? item.quantity_unit : ""}
+                      </div>
+                      <div className="text-xl break-words">
+                        備考: {item.remark}
+                      </div>
+                      <button
+                        onClick={() => startEdit(item)}
+                        className="text-blue-500 mr-2 text-xl"
+                      >
+                        編集
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="text-red-500 text-xl"
+                      >
+                        削除
+                      </button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div>ログインが必要です</div>
+        )}
+      </div>
+
   );
 };
 

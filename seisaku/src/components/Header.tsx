@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Sword, ChefHat } from "lucide-react";
+import { Utensils, ChefHat , KeyRound } from "lucide-react";
 import { useUserStore } from "./index";
 
 const Header = () => {
@@ -7,9 +7,9 @@ const Header = () => {
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
 
   const navItems = [
-    { path: "/ingredients", icon: Sword, label: "食材管理" },
+    { path: "/ingredients", icon: Utensils, label: "食材管理" },
     { path: "/recipes", icon: ChefHat, label: "レシピ" },
-    { path: "/login", icon: ChefHat, label: "ログイン" }
+    { path: "/login", icon: KeyRound, label: "ログイン" }
   ];
 
   return (

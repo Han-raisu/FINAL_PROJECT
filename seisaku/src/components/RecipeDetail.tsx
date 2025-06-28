@@ -50,14 +50,10 @@ const RecipeDetail: React.FC = () => {
         if (data.meals && data.meals.length > 0) {
           const mealData = data.meals[0];
           // 名前・手順を日本語翻訳
-          const [translatedMeal, translatedInstructions] = await Promise.all([
-            translateToJapanese(mealData.strMeal),
-            translateToJapanese(mealData.strInstructions),
-          ]);
           setMeal({
             ...mealData,
-            translatedMeal,
-            translatedInstructions,
+            translatedMeal: null,
+            translatedInstructions: null,
           });
         } else {
           setError("レシピが見つかりませんでした。");
@@ -97,9 +93,7 @@ const RecipeDetail: React.FC = () => {
             alt={meal.strMeal}
             className="w-full max-h-80 object-cover rounded"
           />
-          <h2 className="text-2xl font-bold text-center">
-            {meal.translatedMeal ?? meal.strMeal}
-          </h2>
+          <h2 className="text-2xl font-bold text-center">{meal.strMeal}</h2>
           <div>
             <h3 className="font-semibold">材料</h3>
             <ul className="list-disc list-inside">
@@ -110,9 +104,14 @@ const RecipeDetail: React.FC = () => {
           </div>
           <div>
             <h3 className="font-semibold">作り方</h3>
-            <p className="whitespace-pre-line">
-              {meal.translatedInstructions ?? meal.strInstructions}
-            </p>
+            {(meal.translatedInstructions ?? meal.strInstructions)
+              .split(/\r?\n/)
+              .filter((line) => line.trim() !== "")
+              .map((line, idx) => (
+                <p key={idx} className="mb-2 leading-relaxed">
+                  {line}
+                </p>
+              ))}
           </div>
         </div>
       ) : null}
