@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../components/supabaseClient";
-import StarBackground from "../components/RecipeDetail";
 interface Ingredient {
   id: number;
   name: string;
@@ -137,10 +136,10 @@ const Ingredients = () => {
   };
 
   return (
+    <div className="bg-lime-50">
       <div className=" p-4 space-y-4 bg-lime-50">
         {userId ? (
           <>
-            {/* 登録フォーム */}
             <form onSubmit={handleSubmit} className="space-y-2 ">
               <div>
                 <label className="block font-medium text-gray-900 mb-1 text-xl">
@@ -148,6 +147,7 @@ const Ingredients = () => {
                 </label>
                 <input
                   type="text"
+                  placeholder="例：鶏肉"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -176,6 +176,7 @@ const Ingredients = () => {
                 </label>
                 <input
                   type="number"
+                  placeholder="例：1"
                   value={formData.quantity_value}
                   onChange={(e) =>
                     setFormData({ ...formData, quantity_value: e.target.value })
@@ -208,6 +209,7 @@ const Ingredients = () => {
                 </label>
                 <textarea
                   value={formData.remark}
+                  placeholder="例：一口サイズにカットしてジップロックで冷凍庫保存"
                   onChange={(e) =>
                     setFormData({ ...formData, remark: e.target.value })
                   }
@@ -337,7 +339,7 @@ const Ingredients = () => {
           <div>ログインが必要です</div>
         )}
       </div>
-
+    </div>
   );
 };
 

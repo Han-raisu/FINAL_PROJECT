@@ -8,7 +8,6 @@ interface MealDetail {
   strInstructions: string;
   [key: string]: any;
   translatedMeal?: string;
-  translatedInstructions?: string;
 }
 
 const RecipeDetail: React.FC = () => {
@@ -16,27 +15,6 @@ const RecipeDetail: React.FC = () => {
   const [meal, setMeal] = useState<MealDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // 翻訳API（中継サーバー経由）
-  const translateToJapanese = async (text: string): Promise<string> => {
-    try {
-      const res = await fetch("http://localhost:3001/api/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          q: text,
-          source: "en",
-          target: "ja",
-          format: "text",
-        }),
-      });
-      const data = await res.json();
-      return data.translatedText;
-    } catch (err) {
-      console.error("翻訳エラー:", err);
-      return text;
-    }
-  };
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -53,7 +31,6 @@ const RecipeDetail: React.FC = () => {
           setMeal({
             ...mealData,
             translatedMeal: null,
-            translatedInstructions: null,
           });
         } else {
           setError("レシピが見つかりませんでした。");
@@ -104,7 +81,7 @@ const RecipeDetail: React.FC = () => {
           </div>
           <div>
             <h3 className="font-semibold">作り方</h3>
-            {(meal.translatedInstructions ?? meal.strInstructions)
+            {(meal.strInstructions)
               .split(/\r?\n/)
               .filter((line) => line.trim() !== "")
               .map((line, idx) => (
