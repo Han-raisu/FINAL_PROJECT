@@ -83,7 +83,7 @@ const Login = () => {
 
   return (
     <div className="bg-lime-50 min-h-screen flex flex-col gap-4">
-      <div className={cn(" flex flex-col gap-4   font-bold ")}>
+      <div className={cn(" flex flex-col gap-4 font-bold ")}>
         <Card>
           <CardHeader>
             <CardDescription>

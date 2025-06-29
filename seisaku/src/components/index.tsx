@@ -13,15 +13,6 @@ export type SyokuzaiKanri = {
   created_at?: string;
   user_id: string;
 };
-/*export interface Ingredient {
-  id: string;
-  name: string;
-  remark: string;
-  expiryDate: string;
-  createdAt: string;
-  userId: string;
-}*/
-
 export interface Recipe {
   id: string;
   name: string;

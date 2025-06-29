@@ -27,7 +27,6 @@ const RecipeDetail: React.FC = () => {
         const data = await res.json();
         if (data.meals && data.meals.length > 0) {
           const mealData = data.meals[0];
-          // 名前・手順を日本語翻訳
           setMeal({
             ...mealData,
             translatedMeal: null,

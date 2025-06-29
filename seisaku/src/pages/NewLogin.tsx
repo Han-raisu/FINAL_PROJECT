@@ -64,7 +64,7 @@ export function NewLogin({ className, ...props }: React.ComponentProps<"div">) {
       <div className={cn(" flex flex-col gap-4", className)} {...props}>
         <Card>
           <CardHeader>
-            <CardTitle>新規登録</CardTitle>
+            <CardTitle className="text-xl">新規登録</CardTitle>
             <CardDescription>
               {error && (
                 <div className="text-red-500 text-sm mt-2">{error}</div>
@@ -75,7 +75,9 @@ export function NewLogin({ className, ...props }: React.ComponentProps<"div">) {
             <form onSubmit={handleSignUp}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="email">メールアドレス</Label>
+                  <Label htmlFor="email" className="text-lg">
+                    メールアドレス
+                  </Label>
                   <Input
                     id="email"
                     type="email"
@@ -91,7 +93,9 @@ export function NewLogin({ className, ...props }: React.ComponentProps<"div">) {
                 </div>
                 <div className="grid gap-3">
                   <div className="flex items-center">
-                    <Label htmlFor="password">パスワード</Label>
+                    <Label htmlFor="password" className="text-lg">
+                      パスワード
+                    </Label>
                   </div>
                   <Input
                     id="password"
@@ -107,7 +111,11 @@ export function NewLogin({ className, ...props }: React.ComponentProps<"div">) {
                   />
                 </div>
                 <div className="flex flex-col gap-3">
-                  <Button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:bg-gray-400" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+                    disabled={isLoading}
+                  >
                     {isLoading ? "処理中..." : "サインイン"}
                   </Button>
                 </div>
@@ -115,6 +123,15 @@ export function NewLogin({ className, ...props }: React.ComponentProps<"div">) {
             </form>
           </CardContent>
         </Card>
+        <div className="border-2 border-black p-4 rounded-lg shadow-md bg-lime-50">
+          <h2 className="text-2xl font-semibold mb-4">使い方</h2>
+          <ol className="list-decimal list-inside space-y-4 text-gray-700">
+            <li>アカウントを作成してログイン</li>
+            <li>家にある食材を登録</li>
+            <li>登録した食材で作れるレシピを確認</li>
+            <li>食材管理してレシピを参考に料理を作ろう！！</li>
+          </ol>
+        </div>
       </div>
     </div>
   );
