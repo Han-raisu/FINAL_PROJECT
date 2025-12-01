@@ -14,7 +14,11 @@ import NewLogin from "./pages/NewLogin";
 import RecipeDetail from "./components/RecipeDetail";
 
 function App() {
-  const isLoggedIn = useUserStore((state) => state.isLoggedIn);
+  interface UserStoreState {
+    isLoggedIn: boolean;
+  }
+
+  const isLoggedIn: boolean = useUserStore((state: UserStoreState) => state.isLoggedIn);
 
   return (
     <Router>
